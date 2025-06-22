@@ -29,7 +29,7 @@ class SplashScreenViewModel @Inject constructor(
     }
 
     private fun initialDestination() = viewModelScope.launch {
-        delay(500)
+        delay(1000)
         dataStore.data.collect {
             val appState = if (it[LOGGED] == true) AppState.Logado else AppState.Deslogado
             _uiState.value = _uiState.value.copy(appState = appState)

@@ -1,25 +1,21 @@
 package br.com.alura.helloapp.navigation
 
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import br.com.alura.helloapp.DestinosHelloApp
-import br.com.alura.helloapp.preferences.PreferencesKey.USER
 import br.com.alura.helloapp.preferences.dataStore
 import br.com.alura.helloapp.ui.home.ListaContatosTela
 import br.com.alura.helloapp.ui.home.ListaContatosViewModel
-import br.com.alura.helloapp.ui.navegaLimpo
 import br.com.alura.helloapp.ui.navegaParaDetalhes
 import br.com.alura.helloapp.ui.navegaParaFormularioContato
+import br.com.alura.helloapp.ui.navegaParaLoginDeslogado
 import kotlinx.coroutines.launch
 
 fun NavGraphBuilder.homeGraph(
@@ -48,21 +44,10 @@ fun NavGraphBuilder.homeGraph(
                 onShowDialog = viewModel::showDialog,
                 onClickDesloga = {
                     coroutineScope.launch {
-                        dataStore.edit { preferences ->
-                            preferences[booleanPreferencesKey("logged")] = false
-                        }
+                        viewModel.logout()
+                        navController.navegaParaLoginDeslogado()
                     }
                 })
-
-            LaunchedEffect(Unit) {
-                viewModel.showDialog(false)
-                coroutineScope.launch {
-                    dataStore.data.collect { preferences ->
-                        val logged = preferences[booleanPreferencesKey("logged")]
-                        if (logged != true) navController.navegaLimpo(DestinosHelloApp.Login.rota)
-                    }
-                }
-            }
         }
     }
 }
