@@ -1,8 +1,11 @@
 package br.com.alura.helloapp.ui.home
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.alura.helloapp.database.ContactDao
+import br.com.alura.helloapp.preferences.PreferencesKey.USER
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ListaContatosViewModel @Inject constructor(
-    private val contactDao: ContactDao
+    private val contactDao: ContactDao,
+    private val dataStore: DataStore<Preferences>,
 ) : ViewModel() {
     private var searchJob: Job? = null
     private val _uiState = MutableStateFlow(ListaContatosUiState())
@@ -33,7 +37,11 @@ class ListaContatosViewModel @Inject constructor(
                     contacts = it, loading = false
                 )
             }
-
+            dataStore.data.collect { preferences ->
+                preferences[USER]?.let { username ->
+                    _uiState.value = _uiState.value.copy(userName = username)
+                }
+            }
         }
     }
 
@@ -58,5 +66,11 @@ class ListaContatosViewModel @Inject constructor(
             }
         }
 
+    }
+
+    fun showDialog(show: Boolean) = viewModelScope.launch {
+        _uiState.value = _uiState.value.copy(
+            showDialog = show
+        )
     }
 }

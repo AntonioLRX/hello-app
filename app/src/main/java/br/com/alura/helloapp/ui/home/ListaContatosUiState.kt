@@ -7,4 +7,6 @@ data class ListaContatosUiState(
     val loading: Boolean = false,
     val logado: Boolean = true,
     val searchValue: String = "",
+    val userName: String = "",
+    val showDialog: Boolean = false,
 )

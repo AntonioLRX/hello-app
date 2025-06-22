@@ -9,11 +9,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.FloatingActionButton
@@ -40,6 +44,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import br.com.alura.helloapp.R
 import br.com.alura.helloapp.data.Contact
 import br.com.alura.helloapp.sampleData.contatosExemplos
@@ -53,14 +58,16 @@ fun ListaContatosTela(
     onClickDesloga: () -> Unit = {},
     onClickAbreDetalhes: (Long) -> Unit = {},
     onClickAbreCadastro: () -> Unit = {},
-    onChangeValue: (String) -> Unit = {}
+    onChangeValue: (String) -> Unit = {},
+    onShowDialog: (Boolean) -> Unit = {},
 ) {
+
     Scaffold(
         topBar = {
             AppBarListaContatos(
                 value = state.searchValue,
                 onChangeValue = onChangeValue,
-                onClickDesloga = onClickDesloga
+                onShowDialog = onShowDialog
             )
         },
         floatingActionButton = {
@@ -87,6 +94,54 @@ fun ListaContatosTela(
                 }
             }
             return@Scaffold
+        }
+
+        if (state.showDialog) {
+            AlertDialog(
+                modifier = Modifier.padding(20.dp),
+                properties = DialogProperties(),
+                title = {
+                    Text(
+                        modifier = Modifier.padding(vertical = 20.dp),
+                        text = stringResource(R.string.description_logout, state.userName)
+                    )
+                },
+                buttons = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(1f)
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth(0.5f)
+
+                                .heightIn(56.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color.Transparent,
+
+                                ),
+                            elevation = ButtonDefaults.elevation(0.dp, pressedElevation = 0.dp),
+                            onClick = { onShowDialog(false) }
+                        ) {
+                            Text(text = stringResource(R.string.cancelar))
+                        }
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth(1f)
+
+                                .heightIn(56.dp),
+                            onClick = onClickDesloga
+                        ) {
+                            Text(text = stringResource(R.string.sair))
+                        }
+                    }
+                },
+
+                onDismissRequest = { onShowDialog(false) }
+            )
+
         }
 
         if (state.contacts.isEmpty()) {
@@ -137,7 +192,7 @@ fun ListaContatosTela(
 fun AppBarListaContatos(
     value: String,
     onChangeValue: (String) -> Unit,
-    onClickDesloga: () -> Unit
+    onShowDialog: (Boolean) -> Unit = {},
 ) {
     TopAppBar(
         title = {
@@ -153,7 +208,7 @@ fun AppBarListaContatos(
         },
         actions = {
             IconButton(
-                onClick = onClickDesloga
+                onClick = { onShowDialog(true) }
             ) {
                 Icon(
                     imageVector = Icons.Default.ExitToApp,

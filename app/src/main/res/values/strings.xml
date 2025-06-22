@@ -28,4 +28,6 @@
     <string name="deslogar">Deslogar</string>
     <string name="usuario_ou_senha_incorreto">Usuário ou senha incorreto</string>
     <string name="logo_do_app">Logo do aplicativo</string>
+    <string name="sair">Sair</string>
+    <string name="description_logout">Olá, %s Tem certeza que deseja sair?</string>
 </resources>

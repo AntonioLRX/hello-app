@@ -13,6 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import br.com.alura.helloapp.DestinosHelloApp
+import br.com.alura.helloapp.preferences.PreferencesKey.USER
 import br.com.alura.helloapp.preferences.dataStore
 import br.com.alura.helloapp.ui.home.ListaContatosTela
 import br.com.alura.helloapp.ui.home.ListaContatosViewModel
@@ -34,6 +35,7 @@ fun NavGraphBuilder.homeGraph(
             val dataStore = LocalContext.current.dataStore
             val coroutineScope = rememberCoroutineScope()
 
+
             ListaContatosTela(
                 state = state,
                 onChangeValue = viewModel::onChangeValue,
@@ -43,16 +45,17 @@ fun NavGraphBuilder.homeGraph(
                 onClickAbreCadastro = {
                     navController.navegaParaFormularioContato()
                 },
+                onShowDialog = viewModel::showDialog,
                 onClickDesloga = {
                     coroutineScope.launch {
                         dataStore.edit { preferences ->
                             preferences[booleanPreferencesKey("logged")] = false
                         }
                     }
-
                 })
 
             LaunchedEffect(Unit) {
+                viewModel.showDialog(false)
                 coroutineScope.launch {
                     dataStore.data.collect { preferences ->
                         val logged = preferences[booleanPreferencesKey("logged")]
