@@ -13,6 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,11 +40,9 @@ class ListaContatosViewModel @Inject constructor(
                     contacts = it, loading = false
                 )
             }
-            dataStore.data.collect { preferences ->
-                preferences[USER]?.let { username ->
-                    _uiState.value = _uiState.value.copy(userName = username)
-                }
-            }
+        }
+        viewModelScope.launch {
+            loadUserName()
         }
     }
 
@@ -79,6 +78,15 @@ class ListaContatosViewModel @Inject constructor(
     fun logout() = viewModelScope.launch {
         dataStore.edit { preferences ->
             preferences[booleanPreferencesKey("logged")] = false
+        }
+    }
+
+    private suspend fun loadUserName() {
+        val userName = dataStore.data.first()[USER]
+        userName?.let {
+            _uiState.value = _uiState.value.copy(
+                userName = userName
+            )
         }
     }
 }
